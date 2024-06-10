@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security6"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title th:text="${title} ?: 'Product'">Sản phẩm</title>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+<section layout:fragment="content">
+    <h1>Danh sách sản phẩm</h1>
+    <div>
+        <a th:href="@{/products/add}" class="btn btn-primary mb-3" sec:authorize="hasAuthority('ADMIN')">Thêm sản phẩm</a>
+    </div>
+    <table class="table table-bordered table-hover">
+        <thead class="table-info">
+        <tr>
+            <th>ID</th>
+            <th>Tên</th>
+            <th>Ảnh</th>
+            <th>Giá</th>
+            <th>Mô tả</th>
+            <th>Danh mục</th>
+            <th sec:authorize="hasAuthority('ADMIN')">Actions</th>
+            <th>Thêm vào giỏ hàng</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="product : ${products}">
+            <td th:text="${product.id}"></td>
+            <td th:text="${product.name}"></td>
+            <td><img th:src="${product.imageData}" alt="" width="150" height="150" </td>
+            <td th:text="${product.price}"></td>
+            <td th:text="${product.description}"></td>
+            <td th:text="${product.category.name}"></td>
+            <td sec:authorize="hasAuthority('ADMIN')">
+                <div >
+                    <a th:href="@{/products/edit/{id}(id=${product.id})}"
+                       class="btn btn-dark btn-transparent">Sửa</a>
+                    <a th:href="@{/products/delete/{id}(id=${product.id})}"
+                       class="btn btn-warning btn-transparent" onclick="return confirm('Bạn có chắc không?')">Xóa</a>
+                </div>
+            </td>
+            <td>
+                <form th:action="@{/cart/add}" method="post" sec:authorize="isAuthenticated()">
+                    <input type="number" name="quantity" min="1" value="1"
+                           class="form-control d-inline-block" style="width: 70px;">
+                    <input type="hidden" th:value="${product.id}"
+                           name="productId"/>
+                    <button type="submit" class="btn btn-primary btn-sm btn-backpack2">Thêm vào giỏ hàng</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</section>
+</body>
+</html>
